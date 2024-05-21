@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Recherche - Node.js et MongoDB</title>
+</head>
+<body>
+    <div>
+        <h1>Résultat pour la recherche de "<%= searchQuery %>" :</h1>
+        <% if (data.length === 0) { %>
+            <strong>Aucun résultat.</strong>
+        <% } else { %>
+            <table>
+                <% data.forEach(item => { %>
+                    <tr>
+                        <th><%= item._id %></th>
+                        <td><%= item.some_string %></td>
+                        <td><%= item.created_at %></td>
+                    </tr>
+                <% }) %>
+            </table>
+        <% } %>
+    </div>
+    <br />
+    <center><a href="/">Retour à l'accueil</a></center>
+</body>
+</html>

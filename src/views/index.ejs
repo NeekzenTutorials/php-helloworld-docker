@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Node.js - MongoDB Test</title>
+</head>
+<body>
+    <div>
+        <h1>Ajouter</h1>
+        <form action="/" method="POST">
+            <label for="input_some_string">Message :</label>
+            <input type="text" name="message" required />
+            <input type="submit" />
+        </form>
+    </div>
+    <br />
+    <div>
+        <% if (data.length === 0) { %>
+            <strong>Pas de données en base.</strong>
+        <% } else { %>
+            <table>
+                <% data.forEach(item => { %>
+                    <tr>
+                        <th><%= item._id %></th>
+                        <td><%= item.some_string %></td>
+                        <td><%= item.created_at %></td>
+                        <td><a href="/delete/<%= item._id %>">❌</a></td>
+                    </tr>
+                <% }) %>
+            </table>
+        <% } %>
+    </div>
+    <br />
+    <hr />
+    <br />
+    <div>
+        <h1>Recherche</h1>
+        <form action="/search" method="POST">
+            <label for="input_some_string">Message :</label>
+            <input type="text" name="message" required />
+            <input type="submit" />
+        </form>
+    </div>
+</body>
+</html>
