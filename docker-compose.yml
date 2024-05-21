@@ -1,23 +1,47 @@
-# /apps/blog.silarhi.fr/docker-compose.yml
 version: '3'
 
 services:
+  mongodb:
+    image: mongo:latest
+    container_name: ${NAME}_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_DATABASE: "${MONGO_DATABASE}"
+      MONGO_USERNAME: "${MONGO_USERNAME}"
+      MONGO_PASSWORD: "${MONGO_PASSWORD}"
+    networks:
+      - lan
+    volumes: 
+      - db:/data/db
+
   app:
-    image: php:7.4-apache
+    image: node:14
     container_name: ${NAME}
     build: .
     networks:
-        - web
+      - lan
+      - web
     labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.${NAME}.rule=Host(`${NAME}.jrcandev.netlib.re`)"
-        - "traefik.http.routers.${NAME}.entrypoints=websecure"
-        - "traefik.http.routers.${NAME}.tls.certresolver=lets-encrypt"
+      - traefik.enable=true
+      - traefik.http.routers.${NAME}.entryPoints=websecure
+      - traefik.http.routers.${NAME}.rule=Host(`${NAME}.jrcandev.netlib.re`)
+      - traefik.http.routers.${NAME}.tls=true
+      - traefik.http.routers.${NAME}.tls.certresolver=myresolver
     restart: always
+    environment:
+      container__name: ${NAME}
+      MONGODB_URI: "mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${NAME}_mongodb:27017/${MONGO_DATABASE}?authSource=admin"
+    volumes:
+      - ./src:/usr/src/app
+    working_dir: /usr/src/app
+    command: ["npm", "start"]
 
 volumes:
-  content:
+  db:
 
 networks:
   web:
     external: true
+  lan:
+    external: false
+    name: lan_${NAME}

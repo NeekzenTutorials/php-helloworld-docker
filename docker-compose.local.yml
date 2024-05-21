@@ -1,25 +1,40 @@
-# /apps/blog.silarhi.fr/docker-compose.yml
 version: '3'
 
 services:
-  app:
-    image: php:7.4-apache
-    container_name: ${NAME}
-    build: .
-    ports:
-      - "8080:80"
+  mongodb:
+    image: mongo:latest
+    container_name: ${NAME}_mongodb_local
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: "${MONGO_DATABASE}"
+      MONGO_INITDB_ROOT_USERNAME: "${MONGO_ROOT_USERNAME}"
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_ROOT_PASSWORD}"
     networks:
-        - web
-    labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.${NAME}.rule=Host(`${NAME}.jrcandev.netlib.re`)"
-        - "traefik.http.routers.${NAME}.entrypoints=websecure"
-        - "traefik.http.routers.${NAME}.tls.certresolver=lets-encrypt"
-    restart: always
+      - lan
+    ports:
+      - "27017:27017"
+    volumes: 
+      - db:/data/db
+
+  app:
+    image: node:14
+    container_name: ${NAME}_local
+    build: .
+    networks:
+      - lan
+    environment:
+      container__name: ${NAME}
+      MONGODB_URI: "mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017/${MONGO_DATABASE}?authSource=admin"
+    volumes:
+      - ./src:/usr/src/app
+    working_dir: /usr/src/app
+    command: ["npm", "start"]
+    ports:
+      - "80:80"
 
 volumes:
-  content:
+  db:
 
 networks:
-  web:
-    external: true
+  lan:
+    driver: bridge
