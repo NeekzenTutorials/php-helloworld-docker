@@ -15,7 +15,7 @@ services:
       - db:/data/db
 
   app:
-    image: node:14
+    image: node:16
     container_name: ${NAME}
     build: .
     networks:
