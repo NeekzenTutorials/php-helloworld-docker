@@ -19,6 +19,7 @@ services:
   app:
     image: node:14
     container_name: ${NAME}_local
+    restart: always
     build: .
     networks:
       - lan
@@ -28,7 +29,7 @@ services:
     volumes:
       - ./src:/usr/src/app
     working_dir: /usr/src/app
-    command: ["npm", "start"]
+    command: ["npm", "install"]
     ports:
       - "80:80"
 
